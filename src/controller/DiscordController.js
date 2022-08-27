@@ -52,7 +52,7 @@ export default class DiscordController {
             embed.addFields({ name: key, value: value });
         });
 
-        if(product.getImage()) {
+        if (product.getImage()) {
             embed.setImage(product.getImage());
         }
 
