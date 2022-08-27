@@ -1,9 +1,9 @@
-import schedule from 'node-schedule';
-
 export default class ScheduleController {
-    scheduleJob (callback, minutesToWait) {
-        schedule.scheduleJob('* \\'+ minutesToWait +' * * *', () => {
-            callback();
-        });
+    scheduleJob (minutesToWait, callback) {
+        if (minutesToWait < 1) {
+            return;
+        }
+        setInterval(callback, minutesToWait * 60 * 1000);
+        callback();
     }
 }

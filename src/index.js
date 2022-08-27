@@ -6,14 +6,16 @@ const url = "https://www.canyon.com/de-de/mountainbike/trail-bikes/spectral/cfr/
 const canyonScrapeController = new CanyonScrapeController(url);
 const scheduleController = new ScheduleController();
 
-scheduleController.scheduleJob(async () => {
-    const productMap = await canyonScrapeController.scrape();
+scheduleController.scheduleJob(1, async () => {
+    const canyonProduct = await canyonScrapeController.scrape();
 
     const red = "\x1b[31m";
     const white = "\x1b[37m";
     const green = "\x1b[32m";
+    const purple = "\x1b[35m";
 
-    productMap.forEach((value, key) => {
+    console.log(purple + canyonProduct.productName + white);
+    canyonProduct.getAvailabilityMap().forEach((value, key) => {
         if (value !== "Bald verfügbar") {
             console.log(key + " " + green + value + white);
         } else {
@@ -21,9 +23,3 @@ scheduleController.scheduleJob(async () => {
         }
     });
 });
-
-
-setInterval(() => {}, 1 << 30); // prevent exiting
-
-
-
