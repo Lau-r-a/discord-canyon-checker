@@ -8,7 +8,9 @@ const canyonScrapeController = new CanyonScrapeController(url);
 const scheduleController = new ScheduleController();
 const discordController = await new DiscordController(process.env.DISCORD_TOKEN).start();
 
-scheduleController.scheduleJob(1, async () => {
+const userId = process.env.USER_ID;
+
+scheduleController.scheduleJob(5, async () => {
     const canyonProduct = await canyonScrapeController.scrape();
 
     const red = "\x1b[31m";
@@ -17,6 +19,7 @@ scheduleController.scheduleJob(1, async () => {
     const purple = "\x1b[35m";
 
     console.log(purple + canyonProduct.productName + white);
+
     canyonProduct.getAvailabilityMap().forEach((value, key) => {
         if (value !== "Bald verfügbar") {
             console.log(key + " " + green + value + white);
@@ -24,4 +27,6 @@ scheduleController.scheduleJob(1, async () => {
             console.log(key+ " " + red + value + white);
         }
     });
+
+    discordController.sendProduct(userId, canyonProduct);
 });

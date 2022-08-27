@@ -1,13 +1,17 @@
 export default class CanyonProduct {
 
     productName;
+    price;
     availabilityMap;
     image;
+    url;
 
-    constructor(productName, availabilityMap, image) {
+    constructor(productName, price, availabilityMap, image, url) {
         this.productName = productName;
+        this.price = price;
         this.availabilityMap = availabilityMap;
         this.image = image;
+        this.url = url;
     }
 
     getProductName() {
@@ -20,5 +24,13 @@ export default class CanyonProduct {
 
     getImage() {
         return this.image;
+    }
+
+    getUrl() {
+        return this.url;
+    }
+
+    getPrice() {
+        return this.price;
     }
 }
