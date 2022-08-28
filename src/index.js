@@ -2,7 +2,7 @@ import CanyonScrapeController from './controller/CanyonScrapeController.js';
 import DiscordController from './controller/DiscordController.js';
 import ScheduleController from './controller/ScheduleController.js';
 
-const url = "https://www.canyon.com/de-de/mountainbike/trail-bikes/spectral/cfr/spectral-29-cfr/3193.html";
+const url = process.env.URL;
 
 const canyonScrapeController = new CanyonScrapeController(url);
 const scheduleController = new ScheduleController();
@@ -11,6 +11,8 @@ const discordController = await new DiscordController(process.env.DISCORD_TOKEN)
 const userId = process.env.USER_ID;
 const forceSendInterval = process.env.NOT_AVAILABLE_SEND_INTERVAL;
 let lastSend = 0;
+
+var userIdList = userId.split(',');
 
 // schedule scrape every 6 minutes
 scheduleController.scheduleJob(6, async () => {
@@ -36,7 +38,10 @@ scheduleController.scheduleJob(6, async () => {
     });
 
     if (isAvailable || (Date.now() - lastSend > 1000 * 60 * 60 * forceSendInterval)) {
-        discordController.sendProduct(userId, canyonProduct);
+
+        userIdList.forEach((id) => {
+            discordController.sendProduct(id, canyonProduct);
+        });        
         console.log("Sent product to discord");
         lastSend = Date.now();
     }

@@ -3,6 +3,7 @@ version: '3.1'
 services:
   discordbot:
     environment:
+      URL: ${URL}
       DISCORD_TOKEN: ${DISCORD_TOKEN}
       USER_ID: ${USER_ID}
       NOT_AVAILABLE_SEND_INTERVAL: ${NOT_AVAILABLE_SEND_INTERVAL}
