@@ -39,7 +39,9 @@ scheduleController.scheduleJob(6, async () => {
 
     if (isAvailable || (Date.now() - lastSend > 1000 * 60 * 60 * forceSendInterval)) {
 
-        userIdList.forEach((id) => {discordController.sendProduct(id, canyonProduct);});        
+        userIdList.forEach((id) => {
+            discordController.sendProduct(id, canyonProduct);
+        });        
         console.log("Sent product to discord");
         lastSend = Date.now();
     }
