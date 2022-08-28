@@ -3,6 +3,7 @@ version: '3.1'
 services:
   discordbot:
     environment:
+      MINUTES_TO_WAIT: ${MINUTES_TO_WAIT}
       URL: ${URL}
       DISCORD_TOKEN: ${DISCORD_TOKEN}
       USER_ID: ${USER_ID}
