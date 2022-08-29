@@ -8,7 +8,7 @@ const green = "\x1b[32m";
 const purple = "\x1b[35m";
 
 const url = process.env.URL;
-var urlList = url.split(',');
+const urlList = url.split(',');
 
 const canyonScrapeControllerList = [];
 
@@ -23,9 +23,9 @@ const userId = process.env.USER_ID;
 const forceSendInterval = process.env.NOT_AVAILABLE_SEND_INTERVAL;
 let lastSend = 0;
 
-var userIdList = userId.split(',');
+const userIdList = userId.split(',');
 
-await console.log(userIdList)
+console.log(userIdList)
 
 // schedule scrape every X minutes
 const scrapeInterval = process.env.MINUTES_TO_WAIT;
@@ -57,5 +57,13 @@ scheduleController.scheduleJob(scrapeInterval, async () => {
             lastSend = Date.now();
         }
     });
-    
+
+    if (isAvailable || (Date.now() - lastSend > 1000 * 60 * 60 * forceSendInterval)) {
+
+        userIdList.forEach((id) => {
+            discordController.sendProduct(id, canyonProduct);
+        });        
+        console.log("Sent product to discord");
+        lastSend = Date.now();
+    }
 });
