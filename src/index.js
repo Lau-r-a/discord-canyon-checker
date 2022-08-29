@@ -17,7 +17,7 @@ urlList.forEach((productUrl) => {
 });
 
 const scheduleController = new ScheduleController();
-const discordController = await new DiscordController(process.env.DISCORD_TOKEN).start();
+const discordController = await new DiscordController(process.env.DISCORD_TOKEN, process.env.DISCORD_APPLICATION_ID).start();
 
 const userId = process.env.USER_ID;
 const forceSendInterval = process.env.NOT_AVAILABLE_SEND_INTERVAL;
@@ -57,13 +57,4 @@ scheduleController.scheduleJob(scrapeInterval, async () => {
             lastSend = Date.now();
         }
     });
-
-    if (isAvailable || (Date.now() - lastSend > 1000 * 60 * 60 * forceSendInterval)) {
-
-        userIdList.forEach((id) => {
-            discordController.sendProduct(id, canyonProduct);
-        });        
-        console.log("Sent product to discord");
-        lastSend = Date.now();
-    }
 });
