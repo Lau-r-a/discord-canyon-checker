@@ -8,5 +8,15 @@ services:
       DISCORD_TOKEN: ${DISCORD_TOKEN}
       USER_ID: ${USER_ID}
       NOT_AVAILABLE_SEND_INTERVAL: ${NOT_AVAILABLE_SEND_INTERVAL}
+      DISCORD_APPLICATION_ID: ${DISCORD_APPLICATION_ID}
     restart: always
     build: .
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+
+networks:
+  backend:

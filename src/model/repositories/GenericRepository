@@ -1,0 +1,24 @@
+class GenericRepository {
+
+    constructor(model) {
+        this.model = model;
+    }
+
+    create(object) {
+        return this.model.create(object);
+    }
+
+    find(object) {
+        return this.model.find(object);
+    }
+
+    update(id, object) {
+        return this.model.findByIdAndUpdate(id, object, {new: true, useFindAndModify: false});
+    }
+
+    delete(object) {
+        return this.model.remove(object);
+    }
+}
+
+export default GenericRepository;
