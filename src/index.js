@@ -2,9 +2,20 @@ import CanyonScrapeController from './controller/CanyonScrapeController.js';
 import DiscordController from './controller/DiscordController.js';
 import ScheduleController from './controller/ScheduleController.js';
 
-const url = process.env.URL;
+const red = "\x1b[31m";
+const white = "\x1b[37m";
+const green = "\x1b[32m";
+const purple = "\x1b[35m";
 
-const canyonScrapeController = new CanyonScrapeController(url);
+const url = process.env.URL;
+const urlList = url.split(',');
+
+const canyonScrapeControllerList = [];
+
+urlList.forEach((productUrl) => {
+    canyonScrapeControllerList.push(new CanyonScrapeController(productUrl));
+});
+
 const scheduleController = new ScheduleController();
 const discordController = await new DiscordController(process.env.DISCORD_TOKEN).start();
 
@@ -12,28 +23,38 @@ const userId = process.env.USER_ID;
 const forceSendInterval = process.env.NOT_AVAILABLE_SEND_INTERVAL;
 let lastSend = 0;
 
-var userIdList = userId.split(',');
+const userIdList = userId.split(',');
 
-// schedule scrape every 6 minutes
-scheduleController.scheduleJob(6, async () => {
-    const canyonProduct = await canyonScrapeController.scrape();
+console.log(userIdList)
 
-    const red = "\x1b[31m";
-    const white = "\x1b[37m";
-    const green = "\x1b[32m";
-    const purple = "\x1b[35m";
+// schedule scrape every X minutes
+const scrapeInterval = process.env.MINUTES_TO_WAIT;
 
-    console.log(purple + canyonProduct.productName + white);
+scheduleController.scheduleJob(scrapeInterval, async () => {
+    canyonScrapeControllerList.forEach(async product => {
+        const canyonProduct = await product.scrape();
 
-    let isAvailable = false;
+        console.log(purple + canyonProduct.productName + white);
 
-    //TODO: Rework to save last state and only send once if availability changed
-    canyonProduct.getAvailabilityMap().forEach((value, key) => {
-        if (value !== "Bald verfügbar") {
-            console.log(key + " " + green + value + white);
-            isAvailable = true;
-        } else {
-            console.log(key + " " + red + value + white);
+        let isAvailable = false;
+
+        //TODO: Rework to save last state and only send once if availability changed
+        canyonProduct.getAvailabilityMap().forEach((value, key) => {
+            if (value !== "Bald verfügbar") {
+                console.log(key + " " + green + value + white);
+                isAvailable = true;
+            } else {
+                console.log(key + " " + red + value + white);
+            }
+        });
+
+        if (isAvailable || (Date.now() - lastSend > 1000 * 60 * 60 * forceSendInterval)) {
+
+            userIdList.forEach((id) => {
+                discordController.sendProduct(id, canyonProduct);
+            });        
+            console.log("Sent product to discord");
+            lastSend = Date.now();
         }
     });
 

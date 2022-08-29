@@ -7,6 +7,7 @@ export default class CanyonScrapeController {
 
     constructor(url) {
         this.url = url;
+        //console.log("Created new SraperController with "+url)
     }
 
     async scrape() {
