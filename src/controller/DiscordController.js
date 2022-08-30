@@ -110,7 +110,7 @@ export default class DiscordController {
             .setFooter({ text: 'Canyon Bikes', iconURL: 'https://www.canyon.com/on/demandware.static/Sites-RoW-Site/-/default/dwa8f4f982/images/favicon-96x96.png' });
 
         product.getAvailabilityMap().forEach((value, key) => {
-            embed.addFields({ name: key, value: value });
+            embed.addFields({ name: 'Size:' + key, value: value ? 'Available' : 'Not available' });
         });
 
         if (product.getImage()) {

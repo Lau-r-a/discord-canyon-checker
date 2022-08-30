@@ -24,11 +24,15 @@ export default class UserController {
             await this.createUser(discordId);
         }
 
+        const upperSizes = sizes.map(element => {
+            return element.toUpperCase();
+        });
+
         return this.userRepository.update({discordId: discordId}, {
             $push: {
                 urls: {
                     url: url,
-                    sizes: sizes
+                    sizes: upperSizes
                 }
             }});
     }
@@ -56,20 +60,5 @@ export default class UserController {
 
     async getAllUsers() {
         return this.userRepository.find();
-    }
-
-    async getAllUrls() {
-        const users = await this.getAllUsers();
-        const urls = [];
-        for (const user of users) {
-            for (const url of user.urls) {
-                urls.push({
-                    discordId: user.discordId,
-                    url: url.url,
-                    sizes: url.sizes
-                });
-            }
-        }
-        return urls;
     }
 }

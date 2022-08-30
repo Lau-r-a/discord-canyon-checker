@@ -8,7 +8,8 @@ const schema = new Schema({
     },
     urls: [{
         url: String,
-        sizes: [String]
+        sizes: [String],
+        lastSent: { type : Date, default: 0 }
     }]
 });
 

@@ -21,7 +21,18 @@ export default class CanyonScrapeController {
 
         productSizeCategories.forEach((productSizeCategory) => {
             const splitInfo = productSizeCategory.split('\n');
-            productMap.set(splitInfo[0], splitInfo[1]);
+            console.log(splitInfo);
+
+            let availability;
+            if (splitInfo[1] === 'Bald verfügbar') {
+                availability = false;
+            } else {
+                availability = true;
+            }
+
+            console.log("availability: " + availability);
+
+            productMap.set(splitInfo[0], availability);
         });
 
         await browser.close();
