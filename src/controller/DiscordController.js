@@ -1,6 +1,8 @@
 import { Client, GatewayIntentBits, EmbedBuilder, SlashCommandBuilder, Routes } from 'discord.js';
 import { REST } from '@discordjs/rest';
 
+import UserController from './UserController.js';
+
 const ADD_URL_COMMAND = 'add_url';
 const DELETE_URL_COMMAND = 'delete_url';
 const LIST_URL_COMMAND = 'list_url';
@@ -14,12 +16,16 @@ export default class DiscordController {
     clientId;
     rest;
 
+    userController;
+
     constructor(token, clientId) {
         this.token = token;
         this.clientId = clientId;
     }
 
     async start() {
+
+        this.userController = new UserController();
 
         this.client = new Client({ 
             partials: ["CHANNEL"],
@@ -50,7 +56,8 @@ export default class DiscordController {
         
             if (interaction.commandName === ADD_URL_COMMAND) {
                 const url = interaction.options.getString('url');
-                //TODO: add url to db
+                const sizes = interaction.options.getString('sizes').split(',');
+                await this.userController.addUrl(userId, url, sizes);
                 await interaction.reply('Added url: ' + url);
             } 
         });
@@ -64,6 +71,10 @@ export default class DiscordController {
                 .addStringOption(option =>
                     option.setName('url')
                         .setDescription('The url to add')
+                        .setRequired(true))
+                .addStringOption(option =>
+                    option.setName('sizes')
+                        .setDescription('The sizes to add sparated by comma')
                         .setRequired(true)),
             new SlashCommandBuilder().setName(LIST_URL_COMMAND).setDescription('list regsitered urls'),
             new SlashCommandBuilder().setName(DELETE_URL_COMMAND).setDescription('delete a registered url'),

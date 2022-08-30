@@ -12,8 +12,8 @@ class GenericRepository {
         return this.model.find(object);
     }
 
-    update(id, object) {
-        return this.model.findByIdAndUpdate(id, object, {new: true, useFindAndModify: false});
+    update(query, object) {
+        return this.model.findOneAndUpdate(query, object, {new: true, useFindAndModify: false});
     }
 
     delete(object) {

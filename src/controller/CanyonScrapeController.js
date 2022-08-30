@@ -3,20 +3,13 @@ import CanyonProduct from '../model/CanyonProduct.js';
 
 export default class CanyonScrapeController {
 
-    url;
-
-    constructor(url) {
-        this.url = url;
-        //console.log("Created new SraperController with "+url)
-    }
-
-    async scrape() {
+    async scrape(url) {
         const productMap = new Map();
     
         const browser = await Playwright.chromium.launch();
         const context = await browser.newContext();
         const page = await context.newPage();
-        await page.goto(this.url);
+        await page.goto(url);
 
         const productDescriptionName = await page.locator('.productDescription__productName').allInnerTexts();
         const productSizeCategories = await page.locator('.productConfiguration__selectVariant').allInnerTexts();
@@ -32,6 +25,6 @@ export default class CanyonScrapeController {
         });
 
         await browser.close();
-        return new CanyonProduct(productDescriptionName[0], productPrice, productMap, productImage, this.url);
+        return new CanyonProduct(productDescriptionName[0], productPrice, productMap, productImage, url);
     }
 }
