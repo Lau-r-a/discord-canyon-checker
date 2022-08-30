@@ -1,69 +1,27 @@
+import mongoose from 'mongoose';
+
 import CanyonScrapeController from './controller/CanyonScrapeController.js';
 import DiscordController from './controller/DiscordController.js';
 import ScheduleController from './controller/ScheduleController.js';
+import ServiceFacade from './controller/ServiceFacade.js';
+import UserController from './controller/UserController.js';
 
-const red = "\x1b[31m";
-const white = "\x1b[37m";
-const green = "\x1b[32m";
-const purple = "\x1b[35m";
+const mongoUser = process.env.MONGO_INITDB_ROOT_USERNAME;
+const mongoPassword = process.env.MONGO_INITDB_ROOT_PASSWORD;
+await mongoose.connect('mongodb://' + mongoUser + ':' + mongoPassword + '@mongo/', { useNewUrlParser: true });
 
-const url = process.env.URL;
-const urlList = url.split(',');
-
-const canyonScrapeControllerList = [];
-
-urlList.forEach((productUrl) => {
-    canyonScrapeControllerList.push(new CanyonScrapeController(productUrl));
-});
-
+const userController = new UserController();
 const scheduleController = new ScheduleController();
-const discordController = await new DiscordController(process.env.DISCORD_TOKEN).start();
+const discordController = await new DiscordController(process.env.DISCORD_TOKEN, process.env.DISCORD_APPLICATION_ID).start();
+const canyonScrapeController = new CanyonScrapeController();
 
-const userId = process.env.USER_ID;
-const forceSendInterval = process.env.NOT_AVAILABLE_SEND_INTERVAL;
-let lastSend = 0;
-
-const userIdList = userId.split(',');
-
-console.log(userIdList)
+const facade = new ServiceFacade(discordController, userController, scheduleController, canyonScrapeController);
 
 // schedule scrape every X minutes
 const scrapeInterval = process.env.MINUTES_TO_WAIT;
 
-scheduleController.scheduleJob(scrapeInterval, async () => {
-    canyonScrapeControllerList.forEach(async product => {
-        const canyonProduct = await product.scrape();
+facade.start(scrapeInterval);
 
-        console.log(purple + canyonProduct.productName + white);
 
-        let isAvailable = false;
 
-        //TODO: Rework to save last state and only send once if availability changed
-        canyonProduct.getAvailabilityMap().forEach((value, key) => {
-            if (value !== "Bald verfügbar") {
-                console.log(key + " " + green + value + white);
-                isAvailable = true;
-            } else {
-                console.log(key + " " + red + value + white);
-            }
-        });
 
-        if (isAvailable || (Date.now() - lastSend > 1000 * 60 * 60 * forceSendInterval)) {
-
-            userIdList.forEach((id) => {
-                discordController.sendProduct(id, canyonProduct);
-            });        
-            console.log("Sent product to discord");
-            lastSend = Date.now();
-        }
-    });
-
-    if (isAvailable || (Date.now() - lastSend > 1000 * 60 * 60 * forceSendInterval)) {
-
-        userIdList.forEach((id) => {
-            discordController.sendProduct(id, canyonProduct);
-        });        
-        console.log("Sent product to discord");
-        lastSend = Date.now();
-    }
-});
