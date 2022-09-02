@@ -6,22 +6,22 @@ A discord bot scraping Canyon Prduct pages and notifying for product availabilit
 
 ## Environment Parameters
 
-#### DISCORD_TOKEN
+#### `DISCORD_TOKEN`
 Your discrod bot token
 
-#### DISCORD_APPLICATION_ID
+#### `DISCORD_APPLICATION_ID`
 Your discord appliccation id
 
-#### MINUTES_TO_WAIT
+#### `MINUTES_TO_WAIT`
 The execution of the scrape interval in minutes
 
-#### NOT_AVAILABLE_SEND_INTERVAL_HOURS
+#### `NOT_AVAILABLE_SEND_INTERVAL_HOURS`
 The time frame to send messages even though the product is not available 
 
-#### MONGO_INITDB_ROOT_USERNAME
+#### `MONGO_INITDB_ROOT_USERNAME`
 MongoDB username
 
-#### MONGO_INITDB_ROOT_PASSWORD
+#### `MONGO_INITDB_ROOT_PASSWORD`
 secure MongoDB password
 
 ## Commands
