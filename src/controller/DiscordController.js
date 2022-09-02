@@ -59,7 +59,16 @@ export default class DiscordController {
                 const sizes = interaction.options.getString('sizes').split(',');
                 await this.userController.addUrl(userId, url, sizes);
                 await interaction.reply('Added url: ' + url);
-            } 
+            } else if (interaction.commandName === LIST_URL_COMMAND) {
+                const urls = await this.userController.getUrls(userId);
+                await interaction.reply(urls);
+            } else if (interaction.commandName == DELETE_URL_COMMAND) {
+                const url = interaction.options.getString('url');
+                await this.userController.deleteUrl(userId, url);
+                await interaction.reply('Deleted url: ' + url);
+            } else if (interaction.commandName == HELP_COMMAND) {
+                await interaction.reply('Available commands: ' + [ADD_URL_COMMAND, LIST_URL_COMMAND, DELETE_URL_COMMAND, SCRAPE_COMMAND, HELP_COMMAND].join(', '));
+            }
         });
     }
 
@@ -77,8 +86,12 @@ export default class DiscordController {
                         .setDescription('The sizes to add sparated by comma')
                         .setRequired(true)),
             new SlashCommandBuilder().setName(LIST_URL_COMMAND).setDescription('list regsitered urls'),
-            new SlashCommandBuilder().setName(DELETE_URL_COMMAND).setDescription('delete a registered url'),
-            new SlashCommandBuilder().setName(SCRAPE_COMMAND).setDescription('Manually start a scrape for all registered urls'),
+            new SlashCommandBuilder().setName(DELETE_URL_COMMAND).setDescription('delete a registered url')
+                .addStringOption(option =>
+                    option.setName('url')
+                        .setDescription('The url to remove')
+                        .setRequired(true)),
+            //new SlashCommandBuilder().setName(SCRAPE_COMMAND).setDescription('Manually start a scrape for all registered urls'),
             new SlashCommandBuilder().setName(HELP_COMMAND).setDescription('Show the help')
         ]
         .map(command => command.toJSON());

@@ -15,10 +15,12 @@ const scheduleController = new ScheduleController();
 const discordController = await new DiscordController(process.env.DISCORD_TOKEN, process.env.DISCORD_APPLICATION_ID).start();
 const canyonScrapeController = new CanyonScrapeController();
 
+//init service facade managing all services
 const facade = new ServiceFacade(discordController, userController, scheduleController, canyonScrapeController);
 
 // schedule scrape every X minutes
 const scrapeInterval = process.env.MINUTES_TO_WAIT;
+const forceSendHours = process.env.NOT_AVAILABLE_SEND_INTERVAL_HOURS;
 
 facade.start(scrapeInterval);
 
