@@ -22,7 +22,7 @@ const facade = new ServiceFacade(discordController, userController, scheduleCont
 const scrapeInterval = process.env.MINUTES_TO_WAIT;
 const forceSendHours = process.env.NOT_AVAILABLE_SEND_INTERVAL_HOURS;
 
-facade.start(scrapeInterval);
+facade.start(scrapeInterval, forceSendHours);
 
 
 

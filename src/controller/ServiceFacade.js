@@ -1,3 +1,7 @@
+import logger from '../util/logger.js';
+
+const SLEEP_BETWEEN_SCRAPE_MS = 9600;
+
 export default class ServiceFacade {
 
     constructor(discordController, userController, scheduleController, canyonScrapeController) {
@@ -13,43 +17,54 @@ export default class ServiceFacade {
     }
 
     async processScrapeEntries() {
-        console.log("Processing scrape entries...");
+        logger.info("Processing scrape entries...");
         const users = await this.userController.getAllUsers();
 
         if (!users || Array.isArray(users) && users.length == 0) {
-            console.log('No users found');
+            logger.info('No users found');
             return;
         }
-        console.log("Processing scrape entries for " + users.length + " users");
+        
+        logger.info("Processing scrape entries for " + users.length + " users");
 
         for (const user of users) {
             const urls = user.urls;
-            console.log("Processing scrape entries for user " + user.discordId);
+            logger.info("Processing scrape entries for user " + user.discordId);
             for (const url of urls) {
-                console.log(`Processing ${url.url}`);
-                const canyonProduct = await this.canyonScrapeController.scrape(url.url);
-                const sizes = url.sizes;
-                const availabilityMap = canyonProduct.getAvailabilityMap();
 
-                //check if any registered size is availabe
-                let sendMessage = false;
-                sizes.forEach(size => {
-                    if(availabilityMap.get(size)) {
-                        sendMessage = true;
-                    }
-                });
-
-                //ewww this is ugly, send message if any size is available or not sent in at least every froceSendHours
-                if (sendMessage || Date.now() - url.lastSent > 1000 * 60 * 60 * this.forceSendHours) {
+                logger.info(`Processing ${url.url}`);
+  
+                if (await this.isAvailable(url) || this.isForceSend(url.lastSent)) {
                     await this.discordController.sendProduct(user.discordId, canyonProduct);
+                    //set last send date and save model
                     url.lastSent = Date.now();
                     user.save();
                 }
 
                 //prevent flodding page
-                await this.sleep(9600);
+                await this.sleep(SLEEP_BETWEEN_SCRAPE_MS);
             }
         }
+    }
+
+    async isAvailable(url) {
+        const sizes = url.sizes;
+
+        const canyonProduct = await this.canyonScrapeController.scrape(url.url);
+        const availabilityMap = canyonProduct.getAvailabilityMap();
+
+        //check if any registered size is availabe
+        sizes.forEach(size => {
+            if(availabilityMap.get(size)) {
+                return true;
+            }
+        });
+
+        return false;
+    }
+
+    isForceSend(lastSent) {
+        return Date.now() - lastSent > 1000 * 60 * 60 * this.forceSendHours;
     }
 
     sleep(ms) {

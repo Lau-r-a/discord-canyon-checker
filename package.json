@@ -16,6 +16,7 @@
     "dotenv": "^16.0.1",
     "mongoose": "^6.5.3",
     "node-schedule": "^2.1.0",
+    "pino": "^8.6.1",
     "playwright": "^1.25.1"
   }
 }
